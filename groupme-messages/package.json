@@ -1,0 +1,10 @@
+{
+  "name": "groupme-messages",
+  "version": "1.0.0",
+  "description": "api to handle groupme messages",
+  "main": "handler.js",
+  "dependencies": {
+    "graphql": "^14.0.2"
+  },
+  "author": "Gabe Rojas-Westall <rojaswestall@gmail.com>"
+}

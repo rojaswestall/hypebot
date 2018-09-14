@@ -1,6 +1,6 @@
 # package directories
-node_modules
-jspm_packages
+groupme-messages/node_modules
+groupme-messages/jspm_packages
 
 # Serverless directories
-.serverless
+groupme-messages/.serverless
