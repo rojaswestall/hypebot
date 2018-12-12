@@ -57,9 +57,14 @@ provider:
 #    - exclude-me.js
 #    - exclude-me-dir/**
 
+custom: ${file(./configVars.yml)}
+
 functions:
   handleMessage:
     handler: handler.handleMessage
+    environment:
+      BOT_ID: ${ssm:BOT_ID}
+      BOT_NAME: ${self:custom.botName}
     events:
       - http:
           path: handleMessage

@@ -1,4 +1,5 @@
 'use strict';
+const sendMessage = require('./actions/sendMessage');
 
 /* handler.js */
 const {
@@ -40,14 +41,18 @@ module.exports.query = (event, context, callback) => graphql(schema, event.query
 
 module.exports.handleMessage = (event, context, callback) => {
 	console.log(event);
-  const response = {
-    statusCode: 200,
-    headers: {
-    	'Access-Control-Allow-Origin': '*',
-    	'Access-Control-Allow-Credentials': true
-    },
-    body: JSON.stringify({ message: "Hello World!" }),
-  };
+	var body = JSON.parse(event.body);
+	if (body.name !== "Sample Bot" && body.name !== process.env.BOT_NAME) {
+		sendMessage("a test message from the server");
+	}
+  // const response = {
+  //   statusCode: 200,
+  //   headers: {
+  //   	'Access-Control-Allow-Origin': '*',
+  //   	'Access-Control-Allow-Credentials': true
+  //   },
+  //   body: JSON.stringify({ message: "Hello World!" }),
+  // };
 
-  callback(null, response);
+  callback(null);
 };

@@ -4,6 +4,8 @@
   "description": "api to handle groupme messages",
   "main": "handler.js",
   "dependencies": {
+    "aws-sdk": "^2.320.0",
+    "axios": "^0.18.0",
     "graphql": "^14.0.2"
   },
   "author": "Gabe Rojas-Westall <rojaswestall@gmail.com>"
