@@ -13,6 +13,7 @@ module.exports = (data) => {
             firstName: data.firstName,
             lastName: data.lastName,
             sirName: data.sirName,
+            email: data.email,
             birthday: data.birthday,
             crossingDate: data.crossingDate,
             tasks: [],

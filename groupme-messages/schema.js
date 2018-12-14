@@ -37,6 +37,7 @@ const brotherType = new GraphQLObjectType({
         firstName: { type: new GraphQLNonNull(GraphQLString) },
         lastName: { type: new GraphQLNonNull(GraphQLString) },
         sirName: { type: new GraphQLNonNull(GraphQLString) },
+        email: { type: new GraphQLNonNull(GraphQLString) },
         birthday: { type: new GraphQLNonNull(GraphQLString) },
         crossingDate: { type: new GraphQLNonNull(GraphQLString) },
         tasks: { type: new GraphQLNonNull(GraphQLList(taskType)) },
@@ -74,6 +75,7 @@ const schema = new GraphQLSchema({
                     firstName: { type: new GraphQLNonNull(GraphQLString) },
                     lastName: { type: new GraphQLNonNull(GraphQLString) },
                     sirName: { type: new GraphQLNonNull(GraphQLString) },
+                    email: { type: new GraphQLNonNull(GraphQLString) },
                     birthday: { type: new GraphQLNonNull(GraphQLString) },
                     crossingDate: { type: new GraphQLNonNull(GraphQLString) }
                 },
