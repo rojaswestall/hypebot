@@ -17,6 +17,7 @@ const addTask = require('./resolvers/addTask');
 const removeTask = require('./resolvers/removeTask');
 const failTask = require('./resolvers/failTask');
 const completeTask = require('./resolvers/completeTask');
+const updateDueDate = require('./resolvers/updateDueDate');
 
 const taskType = new GraphQLObjectType({
     name: 'Task',
@@ -123,6 +124,15 @@ const schema = new GraphQLSchema({
                 },
                 type: GraphQLBoolean,
                 resolve: (parent, args) => completeTask(args)
+            },
+            updateDueDate: {
+                args: {
+                    id: { type: new GraphQLNonNull(GraphQLString) },
+                    index: { type: new GraphQLNonNull(GraphQLInt) },
+                    newDueDate: { type: new GraphQLNonNull(GraphQLString) }
+                },
+                type: GraphQLString,
+                resolve: (parent, args) => updateDueDate(args)
             }
         }
     })
