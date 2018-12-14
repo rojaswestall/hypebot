@@ -13,7 +13,11 @@ const checkMessage = function(data) {
     // $ - nothing after it
     // i - Case insensitive
 
-    // Instructions for HypeBot
+
+    ////////////////////////////////////////////////////////
+    /////////////// INSTRUCTIONS FOR HYPEBOT ///////////////
+    ////////////////////////////////////////////////////////
+
     const showinstructionsRegex = /^show instructions$/i;
     const instructionsRegex = /^instructions$/i;
     if (messageText && (instructionsRegex.test(messageText) || showinstructionsRegex.test(messageText))) {
@@ -25,10 +29,10 @@ const checkMessage = function(data) {
         // Task Management
         message = message.concat("For tasks:\n")
         message = message.concat("Add Task - <task>\n");
-        message = message.concat("Remove Task - <task#>\n");
-        message = message.concat("Task Completed - <task#>\n");
-        message = message.concat("Task Failed - <task#>\n");
-        message = message.concat("... - <task#> - <knightname>\n");
+        message = message.concat("Remove Task - <task#, ...>\n");
+        message = message.concat("Task Completed - <task#, ...>\n");
+        message = message.concat("Task Failed - <task#, ...>\n");
+        message = message.concat("\"\" - <task#, ...> - <knightname>\n");
         message = message.concat("Show Tasks\n");
         message = message.concat("Show Tasks - <knightname>\n");
         message = message.concat("Show Tasks - chapter\n");
@@ -49,6 +53,92 @@ const checkMessage = function(data) {
         sendMessage(message);
         return;
     }
+
+
+	///////////////////////////////////////////////////////
+    ///////////////////// DEFINITIONS /////////////////////
+    ///////////////////////////////////////////////////////
+
+    const hypeMeRegex = /HYPE ME/;
+    const canisRegex = /Canis/i;
+    const marchitarRegex = /Marchitar/i;
+    const guajiroRegex = /Guajiro/i;
+    const vagabundoRegex = /Vagabundo/i;
+    const fabianRegex = /fabian/i;
+    const gabeRegex = /gabe/i;
+    const javierRegex = /javier/i;
+    const alexRegex = /alex/i;
+    const botRegex = /Hypebot2\.1/;
+    const hypePhrases = Array(
+    	"111119!!!!!",
+    	"EIGHT SEVEN!",
+    	"Too Hype Too Hype!",
+    	"Too Proud Too Proud!",
+    	"Who you wit!?!",
+    	"ONE Culture, ANY Race!",
+    	"We grow as Knights, we grow as Brothers, we grow as one!",
+    	"The purpose of this Brotherhood shall be to promote and maintain the traditional values of UNITY, HONESTY, INTEGRITY, and LEADERSHIP!",
+    	"Crescit Eundo, It Grows as it Goes!!",
+    	"On November 25th, 1997, the Alpha Alpha chapter was founded by five young visionaries!",
+    	"Our charter class was: JAIME MORENO!!!",
+    	"On November 25th, 1987, Omega Delta Phi was founded at Texas Tech University in Lubbock, Texas, by seven Men of Vision!",
+    	"Where are the Capri-Suns?!",
+    	"Who’s gonna represent till they die?",
+    	"Oh yeah we! Walk the walk! And yeah we! Talk the talk!",
+    	"We’re the hypest of the hype and we’re hard as stone!",
+    	"We don’t front! We just escalate!",
+        "Alpha Beta Gamma Delta Epsilon Zeta Eta Theta Iota Kappa Lambda Mu Nu Xi Omicron Pi Rho Sigma Tau Upsilon Phi Chi Psi Omega Delta Phi!!!!",
+        "Hype yourself.");
+
+
+    ////////////////////////////////////////////////////////
+    /////////////////// HYPE ME AND MORE ///////////////////
+    ////////////////////////////////////////////////////////
+
+    // HYPEME
+    // we query the database for that user if we see HYPEME
+
+    if (messageText && hypeMeRegex.test(messageText)) {
+    	// now do math and return normal response 87% of the time
+    	if (Math.random() < 0.87) {
+    		sendMessage(hypePhrases[Math.floor(Math.random()*hypePhrases.length)]);
+    	} else {
+    		// look at user and look them up in the db, return a special response for their phrases
+    		sendMessage("special hype");
+    	}
+    	
+    }
+
+    
+    // AND MORE ...
+    // here we could check against first names in the database
+    // not trying to send a request to the database for every message though
+    // SO, we are hardcoding in the definitions, each bro's name being there
+    if (messageText && (fabianRegex.test(messageText)) || (gabeRegex.test(messageText)) || (javierRegex.test(messageText)) || (alexRegex.test(messageText))) {
+    	// Has 19.87% chance of sending the message
+    	if (fabianRegex.test(messageText) && Math.random() < 0.1987) {
+    		sendMessage("fuck fabian");
+    	}
+    	if (gabeRegex.test(messageText) && Math.random() < 0.1987) {
+    		sendMessage("fuck gabe");
+    	}
+    	if (javierRegex.test(messageText) && Math.random() < 0.1987) {
+    		sendMessage("fuck javier");
+    	}
+    	if (alexRegex.test(messageText) && Math.random() < 0.1987) {
+    		sendMessage("fuck alex");
+    	}
+        return;
+    }
+
+
+    /////////////////////////////////////////////////////////
+    //////////////////// TASK MANAGEMENT ////////////////////
+    /////////////////////////////////////////////////////////
+
+
+
+
 }
 
 module.exports = checkMessage;
@@ -180,24 +270,6 @@ module.exports = checkMessage;
 //         // Have to make sure the bot's name is either Hypebot2.0 or testbot! otherwise it will keep sending messages over and over
 //         if (messageText && fabianRegex.test(messageText) && !(botRegex.test(senderName) || testbotRegex.test(senderName))) {
 //             return "fuck fabian";
-//         }
-        
-//         // SANO -- BRANDON
-//         if (messageText && senderName && sanoRegex.test(senderName) && hypeMeRegex.test(messageText)) {
-//             var sanoPhrases = Array(
-//                 "KAPPAS KAPPAS TILL WE DIE",
-//                 "111119!!!!!",
-//                 "Too Hype Too Hype!",
-//                 "Where are the Capri-Suns?!",
-//                 "Who’s gonna represent till they die?",
-//                 "Too Kute Too Kute",
-//                 "Sigma what, Sigma who??",
-//                 "Alpha Beta Gamma Delta Epsilon Zeta Eta Theta Iota Kappa Lambda Mu Nu Xi Omicron Pi Rho Sigma Tau Upsilon Phi Chi Psi Omega Delta Phi!!!!",
-//                 "Hype yourself.",
-//                 "HEEEELLL YEA",
-//                 "Sano > Jaime > Lykaios > Canis > Marchitar > Guajiro > Vagabundo",
-//                 "Through all unwaivering!");
-//             return sanoPhrases[Math.floor(Math.random()*sanoPhrases.length)];
 //         }
 
 //         // JAIME -- ANGEL

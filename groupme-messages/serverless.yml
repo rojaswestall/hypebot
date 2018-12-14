@@ -116,9 +116,14 @@ resources:
             AttributeDefinitions:
               - AttributeName: id
                 AttributeType: S
+              - AttributeName: crossingDate
+                AttributeType: S
             KeySchema:
               - AttributeName: id
                 KeyType: HASH
+              - AttributeName: crossingDate
+                KeyType: RANGE
+
             ProvisionedThroughput:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1

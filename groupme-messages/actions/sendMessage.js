@@ -7,7 +7,7 @@ const client = axios.create({
 
 const request = function(options) {
 	const onSuccess = function(response) {
-		console.log('Request Successful!', response);
+		// console.log('Request Successful!', response);
 		return response.data;
 	}
 
@@ -42,7 +42,7 @@ const sendMessage = function(message) {
 			bot_id: botId
 		})
 	}).then((response) => {
-		console.log(response);
+		// console.log(response);
 	})
 }
 
