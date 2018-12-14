@@ -11,7 +11,7 @@ module.exports = (data) => {
 		ExpressionAttributeNames: {
 		    "#tsks" : "tasks"
 		},
-		ConditionExpression: "size(tasks) > :zer",
+		ConditionExpression: "currentTasksNum > :zer and :ind < currentTasksNum",
 		ExpressionAttributeValues: {
 		    ":counter" : 1,
 		    ":zer" : 0

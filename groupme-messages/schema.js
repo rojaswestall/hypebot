@@ -120,7 +120,7 @@ const schema = new GraphQLSchema({
                     index: { type: new GraphQLNonNull(GraphQLInt) }
                 },
                 type: GraphQLBoolean,
-                resolve: (parent, args) => failTask(args)
+                resolve: (parent, args) => completeTask(args)
             }
         }
     })

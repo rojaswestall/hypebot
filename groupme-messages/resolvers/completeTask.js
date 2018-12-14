@@ -11,10 +11,11 @@ module.exports = (data) => {
 		ExpressionAttributeNames: {
 		    "#tsks" : "tasks"
 		},
-		ConditionExpression: "size(tasks) > :zer",
+		ConditionExpression: "currentTasksNum > :zer and :ind < currentTasksNum",
 		ExpressionAttributeValues: {
 		    ":counter" : 1,
-		    ":zer" : 0
+		    ":zer" : 0,
+		    ":ind" : data.index
 		}
     };
     return dynamoDb.update(params).promise()
