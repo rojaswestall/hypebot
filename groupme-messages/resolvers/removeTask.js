@@ -14,7 +14,8 @@ module.exports = (data) => {
 		ConditionExpression: "currentTasksNum > :zer and :ind < currentTasksNum",
 		ExpressionAttributeValues: {
 		    ":counter" : 1,
-		    ":zer" : 0
+		    ":zer" : 0,
+		    ":ind" : data.index
 		}
     };
     return dynamoDb.update(params).promise()
