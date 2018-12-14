@@ -138,4 +138,10 @@ const schema = new GraphQLSchema({
     })
 });
 
+// Still need to figure out weird thing with Booleans. Not quite sure how to return it in the resolvers
+// Maybe in each resolver we can just automatically return True once the promise is resolved (so maybe on then)
+// Need to look into what that promise returns though. 
+// Ideally we don't have an error message for every graphQL req that is supposed to return a boolean.
+// removeBrother, removeTask, failTask, completeTask
+
 module.exports = schema;

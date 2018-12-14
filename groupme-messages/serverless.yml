@@ -24,20 +24,20 @@ provider:
   name: aws
   runtime: nodejs8.10
   iamRoleStatements:
-              - Effect: Allow
-                Action:
-                  - dynamodb:DescribeTable
-                  - dynamodb:Query
-                  - dynamodb:Scan
-                  - dynamodb:GetItem
-                  - dynamodb:PutItem
-                  - dynamodb:UpdateItem
-                  - dynamodb:DeleteItem
-                Resource:
-                   Fn::Join:
-                     - ""
-                     - - "arn:aws:dynamodb:*:*:table/"
-                       - Ref: BrothersGqlDynamoDbTable
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+         Fn::Join:
+           - ""
+           - - "arn:aws:dynamodb:*:*:table/"
+             - Ref: BrothersGqlDynamoDbTable
 
 # you can overwrite defaults here
 #  stage: dev
@@ -93,6 +93,17 @@ functions:
     events:
       - http:
           path: handleMessage
+          method: post
+          cors: true
+
+  sendMessage:
+    handler: handler.sendMessage
+    environment:
+      BOT_ID: ${ssm:BOT_ID}
+      BOT_NAME: ${self:custom.botName}
+    events:
+      - http:
+          path: sendMessage
           method: post
           cors: true
 
