@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: groupme-messages # NOTE: update this with your service name
+service: groupme-messages
 
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
@@ -23,6 +23,21 @@ tenant: alphaalpha
 provider:
   name: aws
   runtime: nodejs8.10
+  iamRoleStatements:
+              - Effect: Allow
+                Action:
+                  - dynamodb:DescribeTable
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:DeleteItem
+                Resource:
+                   Fn::Join:
+                     - ""
+                     - - "arn:aws:dynamodb:*:*:table/"
+                       - Ref: BrothersGqlDynamoDbTable
 
 # you can overwrite defaults here
 #  stage: dev
@@ -60,6 +75,16 @@ provider:
 custom: ${file(./configVars.yml)}
 
 functions:
+  queryBrothers:
+    handler: handler.queryBrothers
+    events:
+      - http:
+          path: brothersGqlDynamoDbTable
+          method: post
+          cors: true
+    environment:
+      TABLE_NAME: brothers-gql
+
   handleMessage:
     handler: handler.handleMessage
     environment:
@@ -70,6 +95,22 @@ functions:
           path: handleMessage
           method: post
           cors: true
+
+resources:
+      Resources:
+        BrothersGqlDynamoDbTable:
+          Type: AWS::DynamoDB::Table
+          Properties:
+            TableName: brothers-gql
+            AttributeDefinitions:
+              - AttributeName: id
+                AttributeType: S
+            KeySchema:
+              - AttributeName: id
+                KeyType: HASH
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events

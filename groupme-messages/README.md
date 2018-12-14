@@ -29,3 +29,8 @@ To see service information (like endpoints, api keys, functions, and layers):
 ```
 serverless info
 ```
+
+To only redeploy certain functions of the code use:
+```
+serverless deploy function -f myFuncName
+```
