@@ -17,7 +17,7 @@ module.exports = (data) => {
                 description: data.description,
                 originalDueDate: data.dueDate,
                 dueDate: data.dueDate,
-                dataAssigned: Date.now(),
+                dateAssigned: Date.now(),
                 partners: data.partners,
                 notes: data.notes
             }],

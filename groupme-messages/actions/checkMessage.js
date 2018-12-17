@@ -106,7 +106,7 @@ const checkMessage = function(data) {
     		// look at user and look them up in the db, return a special response for their phrases
     		sendMessage("special hype");
     	}
-    	
+
     }
 
     
@@ -130,7 +130,6 @@ const checkMessage = function(data) {
     	}
         return;
     }
-
 
     /////////////////////////////////////////////////////////
     //////////////////// TASK MANAGEMENT ////////////////////

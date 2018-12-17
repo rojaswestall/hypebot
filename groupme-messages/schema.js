@@ -9,15 +9,18 @@ const {
     GraphQLNonNull,
     GraphQLBoolean
 } = require('graphql');
-const addBrother = require('./resolvers/create');
-const viewBrother = require('./resolvers/view');
-const listBrothers = require('./resolvers/list');
-const removeBrother = require('./resolvers/remove');
+const addBrother = require('./resolvers/createBrother');
+const removeBrother = require('./resolvers/removeBrother');
+const viewBrother = require('./resolvers/viewBrother');
+const listBrothers = require('./resolvers/listBrothers');
+const updateBrother = require('./resolvers/updateBrother');
 const addTask = require('./resolvers/addTask');
 const removeTask = require('./resolvers/removeTask');
 const failTask = require('./resolvers/failTask');
 const completeTask = require('./resolvers/completeTask');
-const updateDueDate = require('./resolvers/updateDueDate');
+const updateTask = require('./resolvers/updateTask');
+const addPhrase = require('./resolvers/addPhrase');
+const removePhrase = require('./resolvers/removePhrase');
 
 const taskType = new GraphQLObjectType({
     name: 'Task',
@@ -25,7 +28,7 @@ const taskType = new GraphQLObjectType({
         description: { type: new GraphQLNonNull(GraphQLString) },
         originalDueDate: { type: new GraphQLNonNull(GraphQLString) },
         dueDate: { type: new GraphQLNonNull(GraphQLString) },
-        dataAssigned: { type: new GraphQLNonNull(GraphQLString) },
+        dateAssigned: { type: new GraphQLNonNull(GraphQLString) },
         partners: { type: new GraphQLNonNull(GraphQLString) },
         notes: { type: new GraphQLNonNull(GraphQLString) }
     }
@@ -42,10 +45,12 @@ const brotherType = new GraphQLObjectType({
         birthday: { type: new GraphQLNonNull(GraphQLString) },
         crossingDate: { type: new GraphQLNonNull(GraphQLString) },
         tasks: { type: new GraphQLNonNull(GraphQLList(taskType)) },
+        phrases: { type: new GraphQLNonNull(GraphQLList(GraphQLString)) },
         tasksCompleted: { type: new GraphQLNonNull(GraphQLInt) },
         tasksFailed: { type: new GraphQLNonNull(GraphQLInt) },
         currentTasksNum: { type: new GraphQLNonNull(GraphQLInt) },
         totalTasks: { type: new GraphQLNonNull(GraphQLInt) },
+        status: { type: new GraphQLNonNull(GraphQLString) },
         addedAt: { type: new GraphQLNonNull(GraphQLString) },
     }
 });
@@ -60,10 +65,12 @@ const schema = new GraphQLSchema({
             },
             viewBrother: {
                 args: {
-                    id: { type: new GraphQLNonNull(GraphQLString) }
+                    id: { type: GraphQLString },
+                    firstName: { type: GraphQLString },
+                    sirName: { type: GraphQLString }
                 },
                 type: brotherType,
-                resolve: (parent, args) => viewBrother(args.id)
+                resolve: (parent, args) => viewBrother(args)
             }
         }
     }),
@@ -78,7 +85,8 @@ const schema = new GraphQLSchema({
                     sirName: { type: new GraphQLNonNull(GraphQLString) },
                     email: { type: new GraphQLNonNull(GraphQLString) },
                     birthday: { type: new GraphQLNonNull(GraphQLString) },
-                    crossingDate: { type: new GraphQLNonNull(GraphQLString) }
+                    crossingDate: { type: new GraphQLNonNull(GraphQLString) },
+                    status: { type: new GraphQLNonNull(GraphQLString) }
                 },
                 type: brotherType,
                 resolve: (parent, args) => addBrother(args)
@@ -87,16 +95,30 @@ const schema = new GraphQLSchema({
                 args: {
                     id: { type: new GraphQLNonNull(GraphQLString) }
                 },
-                type: GraphQLBoolean,
-                resolve: (parent, args) => removeBrother(args.id)
+                type: brotherType,
+                resolve: (parent, args) => removeBrother(args)
+            },
+            updateBrother: {
+                args: {
+                    id: { type: new GraphQLNonNull(GraphQLString) },
+                    status: { type: GraphQLString },
+                    firstName: { type: GraphQLString },
+                    lastName: { type: GraphQLString },
+                    sirName: { type: GraphQLString },
+                    email: { type: GraphQLString },
+                    birthday: { type: GraphQLString },
+                    crossingDate: { type: GraphQLString },
+                },
+                type: brotherType,
+                resolve: (parent, args) => updateBrother(args)
             },
             addTask: {
                 args: {
                     id: { type: new GraphQLNonNull(GraphQLString) },
                     description: { type: new GraphQLNonNull(GraphQLString) },
                     dueDate: { type: new GraphQLNonNull(GraphQLString) },
-                    partners: { type: new GraphQLNonNull(GraphQLString) },
-                    notes: { type: new GraphQLNonNull(GraphQLString) }
+                    partners: { type: GraphQLString },
+                    notes: { type: GraphQLString }
                 },
                 type: taskType,
                 resolve: (parent, args) => addTask(args)
@@ -125,18 +147,40 @@ const schema = new GraphQLSchema({
                 type: GraphQLBoolean,
                 resolve: (parent, args) => completeTask(args)
             },
-            updateDueDate: {
+            updateTask: {
                 args: {
                     id: { type: new GraphQLNonNull(GraphQLString) },
                     index: { type: new GraphQLNonNull(GraphQLInt) },
-                    newDueDate: { type: new GraphQLNonNull(GraphQLString) }
+                    dueDate: { type: GraphQLString },
+                    description: { type: GraphQLString },
+                    originalDueDate: { type: GraphQLString },
+                    partners: { type: GraphQLString },
+                    notes: { type: GraphQLString }
                 },
-                type: GraphQLString,
-                resolve: (parent, args) => updateDueDate(args)
+                type: brotherType,
+                resolve: (parent, args) => updateTask(args)
+            },
+            addPhrase: {
+                args: {
+                    id: { type: new GraphQLNonNull(GraphQLString) },
+                    phrase: { type: new GraphQLNonNull(GraphQLString) }
+                },
+                type: brotherType,
+                resolve: (parent, args) => addPhrase(args)
+            },
+            removePhrase: {
+                args: {
+                    id: { type: new GraphQLNonNull(GraphQLString) },
+                    index: { type: new GraphQLNonNull(GraphQLInt) }
+                },
+                type: brotherType,
+                resolve: (parent, args) => removePhrase(args)
             }
         }
     })
 });
+
+// For everything but remove brother we could just return the new brother after the change
 
 // Still need to figure out weird thing with Booleans. Not quite sure how to return it in the resolvers
 // Maybe in each resolver we can just automatically return True once the promise is resolved (so maybe on then)

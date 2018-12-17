@@ -1,3 +1,10 @@
+TO DO:
+- make sure that all the mutations are returning the brother type and not null
+- special phrases from database
+- tasks
+- pins
+
+
 To act as if GroupMe was sending our serverless endpoint a message (as if we were someone in the group chat) you can use curl:
 ```
 curl -d '{"text": "whatever message you want to send", "name": "who ever you want to act as though you're receiving the message from"}' -H "Content-Type: application/json" -X POST https://orc722is9j.execute-api.us-east-1.amazonaws.com/dev/handleMessage

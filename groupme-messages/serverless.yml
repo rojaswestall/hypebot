@@ -34,10 +34,13 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource:
-         Fn::Join:
-           - ""
-           - - "arn:aws:dynamodb:*:*:table/"
-             - Ref: BrothersGqlDynamoDbTable
+        - { "Fn::GetAtt": ["BrothersGqlDynamoDbTable", "Arn" ] }
+        - { "Fn::Join": [ "/", [ { "Fn::GetAtt": ["BrothersGqlDynamoDbTable", "Arn" ] }, "index", "first-name-index" ]]}
+        - { "Fn::Join": [ "/", [ { "Fn::GetAtt": ["BrothersGqlDynamoDbTable", "Arn" ] }, "index", "sir-name-index" ]]}
+
+        # Fn::GetAtt: [ "BrothersGqlDynamoDbTable", "Arn" ]
+        # Fn::Join: [ "/", [ Fn::GetAtt: [ "BrothersGqlDynamoDbTable", "Arn" ], "index", "first-name-index" ]]
+        # Fn::Join: [ "/", [ Fn::GetAtt: [ "BrothersGqlDynamoDbTable", "Arn" ], "index", "sir-name-index" ]]
 
 # you can overwrite defaults here
 #  stage: dev
@@ -108,25 +111,43 @@ functions:
           cors: true
 
 resources:
-      Resources:
-        BrothersGqlDynamoDbTable:
-          Type: AWS::DynamoDB::Table
-          Properties:
-            TableName: brothers-gql
-            AttributeDefinitions:
-              - AttributeName: id
-                AttributeType: S
-              - AttributeName: crossingDate
-                AttributeType: S
+  Resources:
+    BrothersGqlDynamoDbTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: brothers-gql
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: sirName
+            AttributeType: S
+          - AttributeName: firstName
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: sir-name-index
             KeySchema:
-              - AttributeName: id
+              - AttributeName: sirName
                 KeyType: HASH
-              - AttributeName: crossingDate
-                KeyType: RANGE
-
+            Projection:
+              ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
+          - IndexName: first-name-index
+            KeySchema:
+              - AttributeName: firstName
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
