@@ -1,9 +1,9 @@
 'use strict';
 
 const { graphql } = require('graphql');
-const gql = require('graphql-tag');
 const sendMessage = require('./sendMessage');
 const schema = require('../schema');
+const getBrotherID = require('./getBrotherID');
 
 const checkMessage = function(data) {
 
@@ -120,7 +120,6 @@ const checkMessage = function(data) {
     	}
         return;
     }
-
     
     // AND MORE ...
     // here we could check against first names in the database
@@ -147,9 +146,20 @@ const checkMessage = function(data) {
     //////////////////// TASK MANAGEMENT ////////////////////
     /////////////////////////////////////////////////////////
 
-
-
-
+        // Add a task for a knight
+        getBrotherID("Guajiro").then(id => {
+        	sendMessage(id);
+        });
+        // const addTaskRegex = /^Add Task - .*: .*/i;
+        // const knightTaskRegex = /- .*:/i;
+        // const taskRegex = /: .*/i;
+        // if (messageText && addTaskRegex.test(messageText)) {
+        //     var knightString = knightTaskRegex.exec(messageText)[0];
+        //     var knight = knightString.substring(2, knightString.length - 1);
+        //     var task = taskRegex.exec(messageText)[0].substring(2);
+        //     TaskManager.newTask(knight, task);
+        //     return null;
+        // }
 }
 
 module.exports = checkMessage;
