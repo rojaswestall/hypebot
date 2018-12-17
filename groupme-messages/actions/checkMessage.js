@@ -1,5 +1,9 @@
 'use strict';
+
+const { graphql } = require('graphql');
+const gql = require('graphql-tag');
 const sendMessage = require('./sendMessage');
+const schema = require('../schema');
 
 const checkMessage = function(data) {
 
@@ -99,14 +103,22 @@ const checkMessage = function(data) {
     // we query the database for that user if we see HYPEME
 
     if (messageText && hypeMeRegex.test(messageText)) {
-    	// now do math and return normal response 87% of the time
+    	// do math and return normal response 87% of the time
     	if (Math.random() < 0.87) {
     		sendMessage(hypePhrases[Math.floor(Math.random()*hypePhrases.length)]);
     	} else {
-    		// look at user and look them up in the db, return a special response for their phrases
-    		sendMessage("special hype");
-    	}
+    		const query = "query { \
+	    		viewBrother(sirName: \"" + senderName + "\") { \
+	    			phrases \
+	    		} \
+	    	}";
 
+	    	graphql(schema, query).then(result => {
+	    		const specialPhrases = result.data.viewBrother.phrases;
+	        	sendMessage(specialPhrases[Math.floor(Math.random()*specialPhrases.length)]);
+	        });
+    	}
+        return;
     }
 
     

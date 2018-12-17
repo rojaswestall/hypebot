@@ -86,13 +86,14 @@ functions:
           method: post
           cors: true
     environment:
-      TABLE_NAME: brothers-gql
+      TABLE_NAME: ${self:custom.tableName}
 
   handleMessage:
     handler: handler.handleMessage
     environment:
       BOT_ID: ${ssm:BOT_ID}
       BOT_NAME: ${self:custom.botName}
+      TABLE_NAME: ${self:custom.tableName}
     events:
       - http:
           path: handleMessage
@@ -115,7 +116,7 @@ resources:
     BrothersGqlDynamoDbTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: brothers-gql
+        TableName: ${self:custom.tableName}
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S
