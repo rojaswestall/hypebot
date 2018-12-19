@@ -32,6 +32,7 @@ const checkMessage = function(data) {
 
         // Task Management
         message = message.concat("For tasks:\n")
+        message = message.concat("*Hypebot looks for - and ,*\n")
         message = message.concat("Add Task - <task>\n");
         message = message.concat("Remove Task - <task#, ...>\n");
         message = message.concat("Task Completed - <task#, ...>\n");
@@ -139,27 +140,72 @@ const checkMessage = function(data) {
     	if (alexRegex.test(messageText) && Math.random() < 0.1987) {
     		sendMessage("fuck alex");
     	}
-        return;
     }
 
     /////////////////////////////////////////////////////////
     //////////////////// TASK MANAGEMENT ////////////////////
     /////////////////////////////////////////////////////////
 
-        // Add a task for a knight
-        getBrotherID("Guajiro").then(id => {
-        	sendMessage(id);
-        });
-        // const addTaskRegex = /^Add Task - .*: .*/i;
-        // const knightTaskRegex = /- .*:/i;
-        // const taskRegex = /: .*/i;
-        // if (messageText && addTaskRegex.test(messageText)) {
-        //     var knightString = knightTaskRegex.exec(messageText)[0];
-        //     var knight = knightString.substring(2, knightString.length - 1);
-        //     var task = taskRegex.exec(messageText)[0].substring(2);
-        //     TaskManager.newTask(knight, task);
-        //     return null;
-        // }
+    // Add a task for a knight
+    
+    const addTaskRegex = /^Add Task -/i;
+    const brotherAddTaskRegex = /(-.*(?!-)) (-.*)/i;
+    const taskRegex = /- .*/i;
+    if (messageText && addTaskRegex.test(messageText)) {
+
+    	// Setting the date to be the next sunday from whatever today's date is
+    	var d = new Date();
+    	d.setDate(d.getDate() + (7 - d.getDay()) % 7);
+
+    	var brotherString = brotherAddTaskRegex.exec(messageText);
+    	console.log(brotherString);
+    	if (brotherString) {
+    		var assignee = brotherString[2].substring(2).charAt(0).toUpperCase() + brotherString[2].substring(2).slice(1);
+    		getBrotherID(assignee).then(id => {
+    			const query = "mutation { \
+		    		addTask(id: \"" + id + "\", description: \"" + brotherString[1].substring(2) + "\", dueDate: \"" + d.getTime() + "\", notes: \"added from groupme\") { \
+		    			description \
+		    			dueDate \
+		    			dateAssigned \
+		    			notes \
+		    		} \
+		    	}";
+		    	graphql(schema, query).then(result => {
+		    		// if we wanted we could return some new information?
+		        	sendMessage("A new task has been added for Sir " + assignee + " by Sir " + senderName + "!");
+		        	console.log(result);
+		        }).catch((error) => {
+		        	console.log(error);
+		        	sendMessage("There was an error adding the task : ( Check your message and try again!");
+		        });
+		    }).catch(error => {
+		    	console.log("there was an error : (", error);
+		    });
+    	} else {
+    		getBrotherID(senderName).then(id => {
+    			var task = taskRegex.exec(messageText)[0].substring(2); 
+    			const query = "mutation { \
+		    		addTask(id: \"" + id + "\", description: \"" + task + "\", dueDate: \"" + d.getTime() + "\", notes: \"added from groupme\") { \
+		    			description \
+		    			dueDate \
+		    			dateAssigned \
+		    			notes \
+		    		} \
+		    	}";
+		    	graphql(schema, query).then(result => {
+		    		// if we wanted we could return some new information?
+		        	sendMessage("A new task has been added for Sir " + senderName + "!");
+		        }).catch((error) => {
+		        	console.log(error);
+		        	sendMessage("There was an error adding the task : ( Check your message and try again!");
+		        });
+		    }).catch(error => {
+		    	console.log(error);
+		    });
+    	}
+
+        return;
+    }
 }
 
 module.exports = checkMessage;

@@ -29,8 +29,8 @@ const taskType = new GraphQLObjectType({
         originalDueDate: { type: new GraphQLNonNull(GraphQLString) },
         dueDate: { type: new GraphQLNonNull(GraphQLString) },
         dateAssigned: { type: new GraphQLNonNull(GraphQLString) },
-        partners: { type: new GraphQLNonNull(GraphQLString) },
-        notes: { type: new GraphQLNonNull(GraphQLString) }
+        partners: { type: GraphQLString },
+        notes: { type: GraphQLString }
     }
 });
 
@@ -44,7 +44,7 @@ const brotherType = new GraphQLObjectType({
         email: { type: new GraphQLNonNull(GraphQLString) },
         birthday: { type: new GraphQLNonNull(GraphQLString) },
         crossingDate: { type: new GraphQLNonNull(GraphQLString) },
-        tasks: { type: new GraphQLNonNull(GraphQLList(taskType)) },
+        tasks: { type: new GraphQLList(taskType) },
         phrases: { type: new GraphQLNonNull(GraphQLList(GraphQLString)) },
         tasksCompleted: { type: new GraphQLNonNull(GraphQLInt) },
         tasksFailed: { type: new GraphQLNonNull(GraphQLInt) },

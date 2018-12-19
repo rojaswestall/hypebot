@@ -1,7 +1,7 @@
 TO DO:
 - make sure that all the mutations are returning the brother type and not null
-- special phrases from database
 - tasks
+- Cloudwatch events so we can add timed reminders/hypes
 - pins
 
 
