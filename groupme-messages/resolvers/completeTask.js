@@ -16,9 +16,12 @@ module.exports = (data) => {
 		    ":counter" : 1,
 		    ":zer" : 0,
 		    ":ind" : data.index
-		}
+		},
+		ReturnValues: "ALL_NEW"
     };
-    return dynamoDb.update(params).promise()
+    return dynamoDb.update(params).promise().then(result => {
+    	return result.Item;
+    });
 };
 
 // Removes the task

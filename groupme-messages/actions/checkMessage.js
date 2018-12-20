@@ -4,6 +4,9 @@ const { graphql } = require('graphql');
 const sendMessage = require('./sendMessage');
 const schema = require('../schema');
 const getBrotherID = require('./getBrotherID');
+const addTask = require('./groupme-actions/addTask');
+const completeTasks = require('./groupme-actions/completeTask');
+const removeTasks = require('./groupme-actions/removeTask');
 
 const checkMessage = function(data) {
 
@@ -64,6 +67,13 @@ const checkMessage = function(data) {
     ///////////////////// DEFINITIONS /////////////////////
     ///////////////////////////////////////////////////////
 
+    // Could do matching by name in the database, BUT then an extra request needs to be made for every message. Since we're
+    // trying to keep hypebot free, we're going to hardcode these definitions so we only sometimes query the database.
+    // That is, basically we query the database whenever we want to send a message back to the gm becaise 
+    // we performed an action to change something in it. Don't want to perform a query for every message sent in the gm
+
+    // Chapter day can be 0-6, 0 being Sunday
+    const chapterDay = 0;
     const hypeMeRegex = /HYPE ME/;
     const canisRegex = /Canis/i;
     const marchitarRegex = /Marchitar/i;
@@ -74,6 +84,8 @@ const checkMessage = function(data) {
     const javierRegex = /javier/i;
     const alexRegex = /alex/i;
     const botRegex = /Hypebot2\.1/;
+    const brotherSpecificRegex = /(-.*(?!-)) (-.*)/i;
+    const indexRegex = /-\s*(?:\s*\d\s*,\s*)*\s*\d/i;
     const hypePhrases = Array(
     	"111119!!!!!",
     	"EIGHT SEVEN!",
@@ -119,7 +131,6 @@ const checkMessage = function(data) {
 	        	sendMessage(specialPhrases[Math.floor(Math.random()*specialPhrases.length)]);
 	        });
     	}
-        return;
     }
     
     // AND MORE ...
@@ -142,70 +153,75 @@ const checkMessage = function(data) {
     	}
     }
 
+
     /////////////////////////////////////////////////////////
     //////////////////// TASK MANAGEMENT ////////////////////
     /////////////////////////////////////////////////////////
 
-    // Add a task for a knight
-    
+    // ADD A TASK
     const addTaskRegex = /^Add Task -/i;
-    const brotherAddTaskRegex = /(-.*(?!-)) (-.*)/i;
     const taskRegex = /- .*/i;
     if (messageText && addTaskRegex.test(messageText)) {
 
-    	// Setting the date to be the next sunday from whatever today's date is
-    	var d = new Date();
-    	d.setDate(d.getDate() + (7 - d.getDay()) % 7);
+    	var brotherString = brotherSpecificRegex.exec(messageText);
+    	var taskString = taskRegex.exec(messageText);
 
-    	var brotherString = brotherAddTaskRegex.exec(messageText);
-    	console.log(brotherString);
     	if (brotherString) {
-    		var assignee = brotherString[2].substring(2).charAt(0).toUpperCase() + brotherString[2].substring(2).slice(1);
-    		getBrotherID(assignee).then(id => {
-    			const query = "mutation { \
-		    		addTask(id: \"" + id + "\", description: \"" + brotherString[1].substring(2) + "\", dueDate: \"" + d.getTime() + "\", notes: \"added from groupme\") { \
-		    			description \
-		    			dueDate \
-		    			dateAssigned \
-		    			notes \
-		    		} \
-		    	}";
-		    	graphql(schema, query).then(result => {
-		    		// if we wanted we could return some new information?
-		        	sendMessage("A new task has been added for Sir " + assignee + " by Sir " + senderName + "!");
-		        	console.log(result);
-		        }).catch((error) => {
-		        	console.log(error);
-		        	sendMessage("There was an error adding the task : ( Check your message and try again!");
-		        });
-		    }).catch(error => {
-		    	console.log("there was an error : (", error);
-		    });
+    		addTask(chapterDay, brotherString[2].substring(1).trim().charAt(0).toUpperCase() + brotherString[2].substring(1).trim().slice(1), brotherString[1].substring(2), senderName);
+    	} else if (taskString) {
+    		addTask(chapterDay, senderName, taskString[0].substring(2));
     	} else {
-    		getBrotherID(senderName).then(id => {
-    			var task = taskRegex.exec(messageText)[0].substring(2); 
-    			const query = "mutation { \
-		    		addTask(id: \"" + id + "\", description: \"" + task + "\", dueDate: \"" + d.getTime() + "\", notes: \"added from groupme\") { \
-		    			description \
-		    			dueDate \
-		    			dateAssigned \
-		    			notes \
-		    		} \
-		    	}";
-		    	graphql(schema, query).then(result => {
-		    		// if we wanted we could return some new information?
-		        	sendMessage("A new task has been added for Sir " + senderName + "!");
-		        }).catch((error) => {
-		        	console.log(error);
-		        	sendMessage("There was an error adding the task : ( Check your message and try again!");
-		        });
-		    }).catch(error => {
-		    	console.log(error);
-		    });
+    		sendMessage("It looks like you didn't specify a task : ( Check your message and try again!");
     	}
 
         return;
     }
+
+    // COMPLETE TASK
+    const completedTaskRegex = /^Completed Task -/i;
+    const taskCompletedRegex = /^Task Completed -/i;
+    const completedTasksRegex = /^Completed Tasks -/i;
+    const tasksCompletedRegex = /^Tasks Completed -/i;
+    if (messageText && (completedTaskRegex.test(messageText) || taskCompletedRegex.test(messageText) || completedTasksRegex.test(messageText) || tasksCompletedRegex.test(messageText))) {
+
+    	var brotherString = brotherSpecificRegex.exec(messageText);
+    	var indexes = indexRegex.exec(messageText);
+
+    	if (brotherString && indexes) {
+    		completeTasks([ ...new Set(indexes[0].substring(1).split(",").map(str => str.trim()).sort()) ], brotherString[2].substring(1).trim().charAt(0).toUpperCase() + brotherString[2].substring(1).trim().slice(1));
+    	} else if (indexes) {
+    		completeTasks([ ...new Set(indexes[0].substring(1).split(",").map(str => str.trim()).sort()) ], senderName);
+    	} else {
+    		sendMessage("It looks like you didn't specify any tasks :( Check your message and try again!");
+    	}
+
+        return;
+    }
+
+    // REMOVE TASK
+    const removeTaskRegex = /^Remove Task -/i;
+    const removeTasksRegex = /^Remove Tasks -/i;
+    if (messageText && (removeTaskRegex.test(messageText) || removeTasksRegex.test(messageText))) {
+
+    	var brotherString = brotherSpecificRegex.exec(messageText);
+    	var indexes = indexRegex.exec(messageText);
+
+    	if (brotherString && indexes) {
+    		removeTasks([ ...new Set(indexes[0].substring(1).split(",").map(str => str.trim()).sort()) ], brotherString[2].substring(1).trim().charAt(0).toUpperCase() + brotherString[2].substring(1).trim().slice(1), senderName);
+    	} else if (indexes) {
+    		removeTasks([ ...new Set(indexes[0].substring(1).split(",").map(str => str.trim()).sort()) ], senderName);
+    	} else {
+    		sendMessage("It looks like you didn't specify any tasks :( Check your message and try again!");
+    	}
+
+        return;
+    }
+
+    // FAIL TASK
+
+    // SHOW TASKS
+
+    // SHOW STATS
 }
 
 module.exports = checkMessage;

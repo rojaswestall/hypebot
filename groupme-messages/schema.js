@@ -128,7 +128,7 @@ const schema = new GraphQLSchema({
                     id: { type: new GraphQLNonNull(GraphQLString) },
                     index: { type: new GraphQLNonNull(GraphQLInt) }
                 },
-                type: GraphQLBoolean,
+                type: brotherType,
                 resolve: (parent, args) => removeTask(args)
             },
             failTask: {
@@ -136,7 +136,7 @@ const schema = new GraphQLSchema({
                     id: { type: new GraphQLNonNull(GraphQLString) },
                     index: { type: new GraphQLNonNull(GraphQLInt) }
                 },
-                type: GraphQLBoolean,
+                type: brotherType,
                 resolve: (parent, args) => failTask(args)
             },
             completeTask: {
@@ -144,7 +144,7 @@ const schema = new GraphQLSchema({
                     id: { type: new GraphQLNonNull(GraphQLString) },
                     index: { type: new GraphQLNonNull(GraphQLInt) }
                 },
-                type: GraphQLBoolean,
+                type: brotherType,
                 resolve: (parent, args) => completeTask(args)
             },
             updateTask: {

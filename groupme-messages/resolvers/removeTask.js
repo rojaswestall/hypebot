@@ -11,14 +11,16 @@ module.exports = (data) => {
 		ExpressionAttributeNames: {
 		    "#tsks" : "tasks"
 		},
-		ConditionExpression: "currentTasksNum > :zer and :ind < currentTasksNum",
+		ConditionExpression: "currentTasksNum > :zer",
 		ExpressionAttributeValues: {
 		    ":counter" : 1,
-		    ":zer" : 0,
-		    ":ind" : data.index
-		}
+		    ":zer" : 0
+		},
+		ReturnValues: "ALL_NEW"
     };
-    return dynamoDb.update(params).promise()
+    return dynamoDb.update(params).promise().then(result => {
+    	return result.Item;
+    });
 };
 
 // Removes the task
