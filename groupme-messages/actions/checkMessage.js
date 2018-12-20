@@ -7,6 +7,7 @@ const getBrotherID = require('./getBrotherID');
 const addTask = require('./groupme-actions/addTask');
 const completeTasks = require('./groupme-actions/completeTask');
 const removeTasks = require('./groupme-actions/removeTask');
+const tasksFailed = require('./groupme-actions/failTask');
 
 const checkMessage = function(data) {
 
@@ -218,6 +219,29 @@ const checkMessage = function(data) {
     }
 
     // FAIL TASK
+    const failTaskRegex = /^Fail Task -/i;
+    const failTasksRegex = /^Fail Tasks -/i;
+    const failedTaskRegex = /^Failed Task -/i;
+    const failedTasksRegex = /^Failed Tasks -/i;
+    const taskFailedRegex = /^Task Failed -/i;
+    const tasksFailedRegex = /^Tasks Failed -/i;
+    const taskFailRegex = /^Task Fail -/i;
+    const tasksFailRegex = /^Tasks Fail -/i;
+    if (messageText && (failTaskRegex.test(messageText) || failTasksRegex.test(messageText) || failedTaskRegex.test(messageText) || failedTasksRegex.test(messageText) || taskFailedRegex.test(messageText) || tasksFailedRegex.test(messageText) || taskFailRegex.test(messageText) || tasksFailRegex.test(messageText))) {
+
+    	var brotherString = brotherSpecificRegex.exec(messageText);
+    	var indexes = indexRegex.exec(messageText);
+
+    	if (brotherString && indexes) {
+    		tasksFailed([ ...new Set(indexes[0].substring(1).split(",").map(str => str.trim()).sort()) ], brotherString[2].substring(1).trim().charAt(0).toUpperCase() + brotherString[2].substring(1).trim().slice(1), senderName);
+    	} else if (indexes) {
+    		tasksFailed([ ...new Set(indexes[0].substring(1).split(",").map(str => str.trim()).sort()) ], senderName);
+    	} else {
+    		sendMessage("It looks like you didn't specify any tasks :( Check your message and try again!");
+    	}
+
+        return;
+    }
 
     // SHOW TASKS
 

@@ -39,8 +39,7 @@ module.exports = (data) => {
     }
 
     return dynamoDb.update(params).promise().then(result => {
-    	console.log("looking at the data for update brother: ", result);
-    	return result.Item;
+    	return result.Attributes;
     });
 };
 

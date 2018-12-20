@@ -25,5 +25,7 @@ module.exports = (data) => {
         }
     };
     return dynamoDb.update(params).promise()
-        .then(result => params.ExpressionAttributeValues[":newtask"][0])
+        .then(result => {
+            return result.Attributes;
+        })
 };

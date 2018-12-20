@@ -120,7 +120,7 @@ const schema = new GraphQLSchema({
                     partners: { type: GraphQLString },
                     notes: { type: GraphQLString }
                 },
-                type: taskType,
+                type: brotherType,
                 resolve: (parent, args) => addTask(args)
             },
             removeTask: {

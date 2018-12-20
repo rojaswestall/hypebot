@@ -19,7 +19,7 @@ module.exports = (data) => {
 		ReturnValues: "ALL_NEW"
     };
     return dynamoDb.update(params).promise().then(result => {
-    	return result.Item;
+    	return result.Attributes;
     });
 };
 

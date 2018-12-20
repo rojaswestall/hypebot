@@ -12,6 +12,6 @@ module.exports = (data) => {
 		ReturnValues: "ALL_OLD"
     };
     return dynamoDb.delete(params).promise().then(result => {
-    	return result.Item;
+    	return result.Attributes;
     });
 };
