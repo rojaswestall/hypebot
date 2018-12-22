@@ -12,10 +12,12 @@ const addTaskGM = (chapterDay, brother, description, assigner = null) => {
 	getBrotherID(brother).then(id => {
 		const query = "mutation { \
     		addTask(id: \"" + id + "\", description: \"" + description + "\", dueDate: \"" + d.getTime() + "\", notes: \"added from groupme\") { \
-    			description \
-    			dueDate \
-    			dateAssigned \
-    			notes \
+    			tasks { \
+	    			description \
+	    			dueDate \
+	    			dateAssigned \
+	    			notes \
+	    		} \
     		} \
     	}";
     	graphql(schema, query).then(result => {
@@ -27,11 +29,11 @@ const addTaskGM = (chapterDay, brother, description, assigner = null) => {
     		}
         }).catch((error) => {
         	console.log(error);
-        	sendMessage("There was an error adding the task : ( Check your message and try again!");
+        	sendMessage("There was an error adding the task 😕 Check your message and try again!");
         });
     }).catch(error => {
     	console.log("there was an error : (", error);
-    	sendMessage("I couldn't find Sir " + brother + " in my system : ( Check your message and try again!");
+    	sendMessage("I couldn't find Sir " + brother + " in my system 😕 Check your message and try again!");
     });
 }
 

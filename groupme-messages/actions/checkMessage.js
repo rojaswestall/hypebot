@@ -8,6 +8,8 @@ const addTask = require('./groupme-actions/addTask');
 const completeTasks = require('./groupme-actions/completeTask');
 const removeTasks = require('./groupme-actions/removeTask');
 const tasksFailed = require('./groupme-actions/failTask');
+const displayTasks = require('./groupme-actions/displayTasks');
+const displayStats = require('./groupme-actions/showStats');
 
 const checkMessage = function(data) {
 
@@ -87,6 +89,8 @@ const checkMessage = function(data) {
     const botRegex = /Hypebot2\.1/;
     const brotherSpecificRegex = /(-.*(?!-)) (-.*)/i;
     const indexRegex = /-\s*(?:\s*\d\s*,\s*)*\s*\d/i;
+    const brotherRegex = /-\s*.*/i;
+    const chapterRegex = /chapter/i;
     const hypePhrases = Array(
     	"111119!!!!!",
     	"EIGHT SEVEN!",
@@ -159,9 +163,9 @@ const checkMessage = function(data) {
     //////////////////// TASK MANAGEMENT ////////////////////
     /////////////////////////////////////////////////////////
 
-    // ADD A TASK
-    const addTaskRegex = /^Add Task -/i;
-    const taskRegex = /- .*/i;
+    // ADD TASK
+    const addTaskRegex = /^Add Task\s*-/i;
+    const taskRegex = /-\s*.*/i;
     if (messageText && addTaskRegex.test(messageText)) {
 
     	var brotherString = brotherSpecificRegex.exec(messageText);
@@ -170,7 +174,7 @@ const checkMessage = function(data) {
     	if (brotherString) {
     		addTask(chapterDay, brotherString[2].substring(1).trim().charAt(0).toUpperCase() + brotherString[2].substring(1).trim().slice(1), brotherString[1].substring(2), senderName);
     	} else if (taskString) {
-    		addTask(chapterDay, senderName, taskString[0].substring(2));
+    		addTask(chapterDay, senderName, taskString[0].substring(1).trim());
     	} else {
     		sendMessage("It looks like you didn't specify a task : ( Check your message and try again!");
     	}
@@ -178,12 +182,16 @@ const checkMessage = function(data) {
         return;
     }
 
-    // COMPLETE TASK
-    const completedTaskRegex = /^Completed Task -/i;
-    const taskCompletedRegex = /^Task Completed -/i;
-    const completedTasksRegex = /^Completed Tasks -/i;
-    const tasksCompletedRegex = /^Tasks Completed -/i;
-    if (messageText && (completedTaskRegex.test(messageText) || taskCompletedRegex.test(messageText) || completedTasksRegex.test(messageText) || tasksCompletedRegex.test(messageText))) {
+    // COMPLETE TASK(S)
+    const completedTaskRegex = /^Completed Task\s*-/i;
+    const taskCompletedRegex = /^Task Completed\s*-/i;
+    const completedTasksRegex = /^Completed Tasks\s*-/i;
+    const tasksCompletedRegex = /^Tasks Completed\s*-/i;
+    const taskCompleteRegex = /^Task Complete\s*-/i;
+    const tasksCompleteRegex = /^Tasks Complete\s*-/i;
+    const completeTaskRegex = /^Complete Task\s*-/i;
+    const completeTasksRegex = /^Complete Tasks\s*-/i;
+    if (messageText && (completedTaskRegex.test(messageText) || taskCompletedRegex.test(messageText) || completedTasksRegex.test(messageText) || tasksCompletedRegex.test(messageText) || taskCompleteRegex.test(messageText) || tasksCompleteRegex.test(messageText) || completeTaskRegex.test(messageText) || completeTasksRegex.test(messageText))) {
 
     	var brotherString = brotherSpecificRegex.exec(messageText);
     	var indexes = indexRegex.exec(messageText);
@@ -199,9 +207,9 @@ const checkMessage = function(data) {
         return;
     }
 
-    // REMOVE TASK
-    const removeTaskRegex = /^Remove Task -/i;
-    const removeTasksRegex = /^Remove Tasks -/i;
+    // REMOVE TASK(S)
+    const removeTaskRegex = /^Remove Task\s*-/i;
+    const removeTasksRegex = /^Remove Tasks\s*-/i;
     if (messageText && (removeTaskRegex.test(messageText) || removeTasksRegex.test(messageText))) {
 
     	var brotherString = brotherSpecificRegex.exec(messageText);
@@ -218,22 +226,22 @@ const checkMessage = function(data) {
         return;
     }
 
-    // FAIL TASK
-    const failTaskRegex = /^Fail Task -/i;
-    const failTasksRegex = /^Fail Tasks -/i;
-    const failedTaskRegex = /^Failed Task -/i;
-    const failedTasksRegex = /^Failed Tasks -/i;
-    const taskFailedRegex = /^Task Failed -/i;
-    const tasksFailedRegex = /^Tasks Failed -/i;
-    const taskFailRegex = /^Task Fail -/i;
-    const tasksFailRegex = /^Tasks Fail -/i;
+    // FAIL TASK(S)
+    const failTaskRegex = /^Fail Task\s*-/i;
+    const failTasksRegex = /^Fail Tasks\s*-/i;
+    const failedTaskRegex = /^Failed Task\s*-/i;
+    const failedTasksRegex = /^Failed Tasks\s*-/i;
+    const taskFailedRegex = /^Task Failed\s*-/i;
+    const tasksFailedRegex = /^Tasks Failed\s*-/i;
+    const taskFailRegex = /^Task Fail\s*-/i;
+    const tasksFailRegex = /^Tasks Fail\s*-/i;
     if (messageText && (failTaskRegex.test(messageText) || failTasksRegex.test(messageText) || failedTaskRegex.test(messageText) || failedTasksRegex.test(messageText) || taskFailedRegex.test(messageText) || tasksFailedRegex.test(messageText) || taskFailRegex.test(messageText) || tasksFailRegex.test(messageText))) {
 
     	var brotherString = brotherSpecificRegex.exec(messageText);
     	var indexes = indexRegex.exec(messageText);
 
     	if (brotherString && indexes) {
-    		tasksFailed([ ...new Set(indexes[0].substring(1).split(",").map(str => str.trim()).sort()) ], brotherString[2].substring(1).trim().charAt(0).toUpperCase() + brotherString[2].substring(1).trim().slice(1), senderName);
+    		tasksFailed([ ...new Set(indexes[0].substring(1).split(",").map(str => str.trim()).sort()) ], brotherString[2].substring(1).trim().charAt(0).toUpperCase() + brotherString[2].substring(1).trim().slice(1));
     	} else if (indexes) {
     		tasksFailed([ ...new Set(indexes[0].substring(1).split(",").map(str => str.trim()).sort()) ], senderName);
     	} else {
@@ -244,88 +252,83 @@ const checkMessage = function(data) {
     }
 
     // SHOW TASKS
+    const showTasksPersonRegex = /^Show Tasks\s*-/i;
+    const showTasksRegex = /^Show Tasks$/i;
+    const displayTasksPersonRegex = /^Display Tasks\s*-/i;
+    const displayTasksRegex = /^Display Tasks$/i;
+    if (messageText && (showTasksPersonRegex.test(messageText) || showTasksRegex.test(messageText) || displayTasksPersonRegex.test(messageText) || displayTasksRegex.test(messageText))) {
+
+    	var brotherString = brotherRegex.exec(messageText);
+
+    	if (brotherString && chapterRegex.exec(brotherString[0].substring(1).trim())) {
+    		displayTasks();
+    	} else if (brotherString) {
+    		displayTasks(brotherString[0].substring(1).trim().charAt(0).toUpperCase() + brotherString[0].substring(1).trim().slice(1));
+    	} else {
+    		displayTasks(senderName);
+    	}
+
+        return;
+    }
 
     // SHOW STATS
+    const showStatsPersonRegex = /^Show Stats\s*-/i;
+    const showStatsRegex = /^Show Stats$/i;
+    const displayStatsPersonRegex = /^Display Stats\s*-/i;
+    const displayStatsRegex = /^Display Stats$/i;
+    if (messageText && (showStatsPersonRegex.test(messageText) || showStatsRegex.test(messageText) || displayStatsPersonRegex.test(messageText) || displayStatsRegex.test(messageText))) {
+
+    	var brotherString = brotherRegex.exec(messageText);
+
+    	if (brotherString && chapterRegex.exec(brotherString[0].substring(1).trim())) {
+    		displayStats();
+    	} else if (brotherString) {
+    		displayStats(brotherString[0].substring(1).trim().charAt(0).toUpperCase() + brotherString[0].substring(1).trim().slice(1));
+    	} else {
+    		displayStats(senderName);
+    	}
+
+        return;
+    }
+
+
+    //////////////////////////////////////////////////////////
+    ///////////////////// PIN MANAGEMENT /////////////////////
+    //////////////////////////////////////////////////////////
+
+    // SHOW PINS
+    const showStatsPersonRegex = /^Show Stats\s*-/i;
+    const showStatsRegex = /^Show Stats$/i;
+    const displayStatsPersonRegex = /^Display Stats\s*-/i;
+    const displayStatsRegex = /^Display Stats$/i;
+    if (messageText && (showStatsPersonRegex.test(messageText) || showStatsRegex.test(messageText) || displayStatsPersonRegex.test(messageText) || displayStatsRegex.test(messageText))) {
+
+        var brotherString = brotherRegex.exec(messageText);
+
+        if (brotherString && chapterRegex.exec(brotherString[0].substring(1).trim())) {
+            displayStats();
+        } else if (brotherString) {
+            displayStats(brotherString[0].substring(1).trim().charAt(0).toUpperCase() + brotherString[0].substring(1).trim().slice(1));
+        } else {
+            displayStats(senderName);
+        }
+
+        return;
+    }
+
+    // ADD PIN
+
+
+    // REMOVE PIN(S)
+
+
+    // CLEAR PINS
+
+
+
 }
 
 module.exports = checkMessage;
-
-
-    /*
-     * Called when the bot receives a message.
-     *
-     * @static
-     * @param {Object} message The message data incoming from GroupMe
-     * @return {string}
-     */
-//     static checkMessage(message) {
-
-//         // Add a task for a knight
-//         const addTaskRegex = /^Add Task - .*: .*/i;
-//         const knightTaskRegex = /- .*:/i;
-//         const taskRegex = /: .*/i;
-//         if (messageText && addTaskRegex.test(messageText)) {
-//             var knightString = knightTaskRegex.exec(messageText)[0];
-//             var knight = knightString.substring(2, knightString.length - 1);
-//             var task = taskRegex.exec(messageText)[0].substring(2);
-//             TaskManager.newTask(knight, task);
-//             return null;
-//         }
-
-//         // Remove a task for a knight
-//         const removeTaskRegex = /^Remove Task - .*: .*/i;
-//         if (messageText && removeTaskRegex.test(messageText)) {
-//             var knightString = knightTaskRegex.exec(messageText)[0];
-//             var knight = knightString.substring(2, knightString.length - 1);
-//             var taskNumber = taskRegex.exec(messageText)[0].substring(2);
-
-//             TaskManager.removeTask(knight, taskNumber);
-//             return null;
-//         }
-
-//         // A knight completed a task
-//         const completedTaskRegex = /^Task Completed - .*: .*/i;
-//         if (messageText && completedTaskRegex.test(messageText)) {
-//             var knightString = knightTaskRegex.exec(messageText)[0];
-//             var knight = knightString.substring(2, knightString.length - 1);
-//             var taskNumber = taskRegex.exec(messageText)[0].substring(2);
-
-//             TaskManager.taskCompleted(knight, taskNumber);
-//             return null;
-//         }
-
-//         // Show tasks for all the bros
-//         const showTasksRegex = /^Show Tasks$/i;
-//         if (messageText && showTasksRegex.test(messageText)) {
-//             TaskManager.showTasks();
-//             return null;
-//         }
-
-//         // Show tasks for one bro
-//         const showTasksForRegex = /^Show Tasks - .*/i;
-//         const knightRegex = /- .*/i;
-//         if (messageText && showTasksForRegex.test(messageText)) {
-//             var knightString = knightRegex.exec(messageText)[0];
-//             var knight = knightString.substring(2, knightString.length);
-//             TaskManager.showTasksFor(knight);
-//             return null;
-//         }
-
-//         // Show stats for all bros
-//         const showStatsRegex = /^Show Stats$/i;
-//         if (messageText && showStatsRegex.test(messageText)) {
-//             TaskManager.showStats();
-//             return null;
-//         }
-
-//         // Show stats for one bro
-//         const showStatsForRegex = /^Show Stats - .*/i;
-//         if (messageText && showStatsForRegex.test(messageText)) {
-//             var knightString = knightRegex.exec(messageText)[0];
-//             var knight = knightString.substring(2, knightString.length);
-//             TaskManager.showStatsFor(knight);
-//             return null;
-//         }
 
 //         // Add a pin to the pinbook
 //         const addPinRegex = /^Add Pin - .*/i;
@@ -359,175 +362,3 @@ module.exports = checkMessage;
 //             PinBook.clearPinBook();
 //             return null;
 //         }
-
-//         const hypeMeRegex = /HYPE ME/;
-//         const lykaiosRegex = /Lykaios/;
-//         const canisRegex = /Canis/;
-//         const guajiroRegex = /Guajiro/;
-//         const vagabundoRegex = /Vagabundo/;
-//         const jaimeRegex = /Jaime/;
-//         const sanoRegex = /Sano/;
-//         const fabianRegex = /fabian/i;
-//         const testbotRegex = /testbot!/;
-//         const botRegex = /Hypebot2\.0/;
-
-//         // Check if the GroupMe message has content and if the regex pattern is true
-
-//         // lol the fuck fabian message
-//         // Have to make sure the bot's name is either Hypebot2.0 or testbot! otherwise it will keep sending messages over and over
-//         if (messageText && fabianRegex.test(messageText) && !(botRegex.test(senderName) || testbotRegex.test(senderName))) {
-//             return "fuck fabian";
-//         }
-
-//         // JAIME -- ANGEL
-//         if (messageText && senderName && jaimeRegex.test(senderName) && hypeMeRegex.test(messageText)) {
-//             var jaimePhrases = Array(
-//                 "111119!!!!!",
-//                 "Too Hype Too Hype!",
-//                 "Too Proud Too Proud!",
-//                 "Who you wit!?!",
-//                 "Hype yourself.",
-//                 "wot in tarnation",
-//                 "https://youtu.be/S15eSFlMXtk", //Upsilon probate
-//                 "Hahah little mac. You have a little mac...",
-//                 "IF you cross....");
-//             return jaimePhrases[Math.floor(Math.random()*jaimePhrases.length)];
-//         }
-//         // You shouldn’t say “when you cross” because that means that you aren’t motivated since you already know you’re going to get in. Instead,  “if you cross” motivates you because you don’t know if you’ll get in or not.
-
-//         // LYKAIOS -- JOHNNY
-//         if (messageText && senderName && lykaiosRegex.test(senderName) && hypeMeRegex.test(messageText)) {
-//             var lykaiosPhrases = Array(
-//                 "You down to smoke???",
-//                 "Hype yourself.",
-//                 "You love your ne-hoes : ) ... and they love you",
-//                 "Bish, what?",
-//                 "You are greatness.",
-//                 "Be strong enough to stand alone, be yourself enough to stand apart, but be wise enough to stand together when the time comes. Be Lykaios."
-//                 );
-//             return lykaiosPhrases[Math.floor(Math.random()*lykaiosPhrases.length)];
-//         }
-
-//         // CANIS -- FABIAN
-//         if (messageText && senderName && canisRegex.test(senderName) && hypeMeRegex.test(messageText)) {
-//             // return "lol fabian fuck u";
-//             var canisPhrases = Array(
-//                 "Hype yourself.",
-//                 "Weeoooooooow",
-//                 "No, you fuck. You're the reason Michael doesn't have a little",
-//                 "lol fabes fuck u",
-//                 "hahahahah angel beat you in smash",
-//                 "津波",
-//                 ".01",
-//                 "Lol ... \"I know how to make hypejuice\"",
-//                 "Kay-so");
-//             return canisPhrases[Math.floor(Math.random()*canisPhrases.length)];
-//         }
-
-//         // GUAJIRO -- JAVIER
-//         if (messageText && senderName && guajiroRegex.test(senderName) && hypeMeRegex.test(messageText)) {
-//             var guajiroPhrases = Array(
-//                 "Hype yourself.",
-//                 "ΦΔΩ. Need I say more?",
-//                 "Fuckin neo",
-//                 "lol get back on line",
-//                 "https://youtu.be/3NXBgSCSrIk",
-//                 "that's racist",
-//                 "that's at least slightly racist",
-//                 "Your word is your bond. And your bond is shit.",
-//                 "Fake friends"
-//                 );
-//             return guajiroPhrases[Math.floor(Math.random()*guajiroPhrases.length)];
-//         }
-
-//         // VAGABUNDO -- ALEX
-//         if (messageText && senderName && vagabundoRegex.test(senderName) && hypeMeRegex.test(messageText)) {
-//             var vagabundoPhrases = Array(
-//                 "Hype yourself.",
-//                 "ΦΔΩ. Need I say more?",
-//                 "Fuckin neo",
-//                 "lol get back on line",
-//                 "https://youtu.be/3NXBgSCSrIk",
-//                 "That's my fraaaand",
-//                 "I'll swipe you in!",
-//                 "mmmmmmmm i don't know",
-//                 "You DON'T have a nice butt",
-//                 "Lol \"pass me the everclear\""
-//                 );
-//             return vagabundoPhrases[Math.floor(Math.random()*vagabundoPhrases.length)];
-//         }
-
-//         // Just for the general member
-//         if (messageText && hypeMeRegex.test(messageText) && !(botRegex.test(senderName) || testbotRegex.test(senderName))) {
-//             var phrases = Array(
-//                 "KAPPAS KAPPAS TILL WE DIE",
-//                 "111119!!!!!",
-//                 "Too Hype Too Hype!",
-//                 "Too Proud Too Proud!",
-//                 "Who you wit!?!",
-//                 "Where are the Capri-Suns?!",
-//                 "Who’s gonna represent till they die?",
-//                 "Too Kute Too Kute",
-//                 "Sigma what, Sigma who??",
-//                 "Alpha Beta Gamma Delta Epsilon Zeta Eta Theta Iota Kappa Lambda Mu Nu Xi Omicron Pi Rho Sigma Tau Upsilon Phi Chi Psi Omega Delta Phi!!!!",
-//                 "Hype yourself.");
-//             // var phrases = Array(
-//             //     "Hope you haven’t been naughty this year ; )",
-//             //     "Twas the night before Christmas when all through the house, The A/C was running cause Fabes lives in the south",
-//             //     "The tree better not be the only thing getting lit this year",
-//             //     "Merry Christmas to Lykaios and his Ne - ho ho hoes!",
-//             //     "Merry Kissmyass");
-//             return phrases[Math.floor(Math.random()*phrases.length)];
-//         }
-
-//         return null;
-//     };
-
-//     /**
-//      * Sends a message to GroupMe with a POST request.
-//      *
-//      * @static
-//      * @param {string} messageText A message to send to chat
-//      * @return {undefined}
-//      */
-//     static sendMessage(messageText) {
-//         // Get the GroupMe bot id saved in `.env`
-//         const botId = process.env.BOT_ID;
-
-//         const options = {
-//             hostname: 'api.groupme.com',
-//             path: '/v3/bots/post',
-//             method: 'POST'
-//         };
-
-//         const body = {
-//             bot_id: botId,
-//             text: messageText
-//         };
-
-//         // Make the POST request to GroupMe with the http module
-//         const botRequest = https.request(options, function(response) {
-//             if (response.statusCode !== 202) {
-//                 console.log('Rejecting bad status code ' + response.statusCode);
-//                 //console.log(response);
-//             } else {
-//                 //console.log(response);
-//             }
-//         });
-
-//         // On error
-//         botRequest.on('error', function(error) {
-//             console.log('Error posting message ' + JSON.stringify(error));
-//         });
-
-//         // On timeout
-//         botRequest.on('timeout', function(error) {
-//             console.log('Timeout posting message ' + JSON.stringify(error));
-//         });
-
-//         // Finally, send the body to GroupMe as a string
-//         botRequest.end(JSON.stringify(body));
-//         console.log('Sending ' + JSON.stringify(body.text));
-//     };
-// };
-

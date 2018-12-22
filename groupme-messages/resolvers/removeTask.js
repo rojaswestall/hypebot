@@ -11,10 +11,11 @@ module.exports = (data) => {
 		ExpressionAttributeNames: {
 		    "#tsks" : "tasks"
 		},
-		ConditionExpression: "currentTasksNum > :zer",
+		ConditionExpression: "currentTasksNum > :zer and :ind < currentTasksNum",
 		ExpressionAttributeValues: {
 		    ":counter" : 1,
-		    ":zer" : 0
+		    ":zer" : 0,
+		    ":ind" : data.index
 		},
 		ReturnValues: "ALL_NEW"
     };

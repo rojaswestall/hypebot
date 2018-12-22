@@ -22,7 +22,8 @@ module.exports = (data) => {
                 notes: data.notes
             }],
             ":counter" : 1
-        }
+        },
+        ReturnValues: "ALL_NEW"
     };
     return dynamoDb.update(params).promise()
         .then(result => {
