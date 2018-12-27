@@ -22,7 +22,9 @@ const addTaskGM = (chapterDay, brother, description, assigner = null) => {
     	}";
     	graphql(schema, query).then(result => {
     		// if we wanted we could return some new information?
-    		if (assigner) {
+    		if (brother === "pins") {
+    			sendMessage("A new pin has been added!");
+    		} else if (assigner) {
     			sendMessage("A new task has been added for Sir " + brother + " by Sir " + assigner + "!");
     		} else {
     			sendMessage("A new task has been added for Sir " + brother + "!");

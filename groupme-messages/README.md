@@ -1,8 +1,6 @@
 TO DO:
-- make sure that all the mutations are returning the brother type and not null
-- tasks
 - Cloudwatch events so we can add timed reminders/hypes
-- pins
+- Make cloudwatch events editable
 
 
 To act as if GroupMe was sending our serverless endpoint a message (as if we were someone in the group chat) you can use curl:

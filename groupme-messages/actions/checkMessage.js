@@ -10,6 +10,8 @@ const removeTasks = require('./groupme-actions/removeTask');
 const tasksFailed = require('./groupme-actions/failTask');
 const displayTasks = require('./groupme-actions/displayTasks');
 const displayStats = require('./groupme-actions/showStats');
+const displayPins = require('./groupme-actions/displayPins');
+const clearPins = require('./groupme-actions/clearPins');
 
 const checkMessage = function(data) {
 
@@ -176,7 +178,7 @@ const checkMessage = function(data) {
     	} else if (taskString) {
     		addTask(chapterDay, senderName, taskString[0].substring(1).trim());
     	} else {
-    		sendMessage("It looks like you didn't specify a task : ( Check your message and try again!");
+    		sendMessage("It looks like you didn't specify a task 😕 Check your message and try again!");
     	}
 
         return;
@@ -201,7 +203,7 @@ const checkMessage = function(data) {
     	} else if (indexes) {
     		completeTasks([ ...new Set(indexes[0].substring(1).split(",").map(str => str.trim()).sort()) ], senderName);
     	} else {
-    		sendMessage("It looks like you didn't specify any tasks :( Check your message and try again!");
+    		sendMessage("It looks like you didn't specify any tasks 😕 Check your message and try again!");
     	}
 
         return;
@@ -220,7 +222,7 @@ const checkMessage = function(data) {
     	} else if (indexes) {
     		removeTasks([ ...new Set(indexes[0].substring(1).split(",").map(str => str.trim()).sort()) ], senderName);
     	} else {
-    		sendMessage("It looks like you didn't specify any tasks :( Check your message and try again!");
+    		sendMessage("It looks like you didn't specify any tasks 😕 Check your message and try again!");
     	}
 
         return;
@@ -245,7 +247,7 @@ const checkMessage = function(data) {
     	} else if (indexes) {
     		tasksFailed([ ...new Set(indexes[0].substring(1).split(",").map(str => str.trim()).sort()) ], senderName);
     	} else {
-    		sendMessage("It looks like you didn't specify any tasks :( Check your message and try again!");
+    		sendMessage("It looks like you didn't specify any tasks 😕 Check your message and try again!");
     	}
 
         return;
@@ -296,69 +298,65 @@ const checkMessage = function(data) {
     ///////////////////// PIN MANAGEMENT /////////////////////
     //////////////////////////////////////////////////////////
 
+    // Pins are just another brother whose names are all "pins". Pretty much only the tasks field of this "brother" is used.
+    // A new function was made for show pins and clear pins. Small adjustments were made to addTask and removeTask to also
+    // function for pins 
+
     // SHOW PINS
-    const showStatsPersonRegex = /^Show Stats\s*-/i;
-    const showStatsRegex = /^Show Stats$/i;
-    const displayStatsPersonRegex = /^Display Stats\s*-/i;
-    const displayStatsRegex = /^Display Stats$/i;
-    if (messageText && (showStatsPersonRegex.test(messageText) || showStatsRegex.test(messageText) || displayStatsPersonRegex.test(messageText) || displayStatsRegex.test(messageText))) {
+    // WE MAY NEED A SPECIAL FUNCTION FOR THIS SO WE DON'T SHOW DUE DATES AND SIR NAME
+    const showPinsRegex = /^Show Pins$/i;
+    const displayPinsRegex = /^Display Pins$/i;
+    if (messageText && (showPinsRegex.test(messageText) || displayPinsRegex.test(messageText))) {
 
-        var brotherString = brotherRegex.exec(messageText);
-
-        if (brotherString && chapterRegex.exec(brotherString[0].substring(1).trim())) {
-            displayStats();
-        } else if (brotherString) {
-            displayStats(brotherString[0].substring(1).trim().charAt(0).toUpperCase() + brotherString[0].substring(1).trim().slice(1));
-        } else {
-            displayStats(senderName);
-        }
+        displayPins();
 
         return;
     }
 
     // ADD PIN
+    const addPinRegex = /^Add Pin\s*-/i;
+    const pinRegex = /-\s*.*/i;
+    if (messageText && (addPinRegex.test(messageText))) {
 
+        var pinString = pinRegex.exec(messageText);
+
+        if (pinString) {
+            addTask(chapterDay, "pins", pinString[0].substring(1).trim());
+        } else {
+            sendMessage("It looks like you didn't specify a pin 😕 Check your message and try again!");
+        }
+        
+        return;
+    }
 
     // REMOVE PIN(S)
+    const removePinRegex = /^Remove Pin\s*-/i;
+    const removePinsRegex = /^Remove Pins\s*-/i;
+    if (messageText && (removePinRegex.test(messageText) || removePinsRegex.test(messageText))) {
 
+        var indexes = indexRegex.exec(messageText);
+
+        if (indexes) {
+            removeTasks([ ...new Set(indexes[0].substring(1).split(",").map(str => str.trim()).sort()) ], "pins");
+        } else {
+            sendMessage("It looks like you didn't specify any pins 😕 Check your message and try again!");
+        }
+
+        return;
+    }
 
     // CLEAR PINS
+    // NEED TO WRITE A NEW FUNCTION FOR THIS TOO
+    const clearPinsRegex = /^Clear Pins$/i;
+    if (messageText && clearPinsRegex.test(messageText)) {
+
+        clearPins();
+
+        return;
+    }
 
 
 
 }
 
 module.exports = checkMessage;
-
-//         // Add a pin to the pinbook
-//         const addPinRegex = /^Add Pin - .*/i;
-//         const PinRegex = /- .*/i;
-//         if (messageText && addPinRegex.test(messageText)) {
-//             var pinString = PinRegex.exec(messageText)[0];
-//             var content = pinString.substring(2, pinString.length);
-//             PinBook.addPin(content);
-//             return null;
-//         }
-
-//         // Remove pin from the pinbook
-//         const removePinRegex = /^Remove Pin - .*/i;
-//         if (messageText && removePinRegex.test(messageText)) {
-//             var pinString = PinRegex.exec(messageText)[0];
-//             var number = pinString.substring(2, pinString.length);
-//             PinBook.removePin(number);
-//             return null;
-//         }
-
-//         // Remove pin from the pinbook
-//         const showPinsRegex = /^Show Pins/i;
-//         if (messageText && showPinsRegex.test(messageText)) {
-//             PinBook.showPins();
-//             return null;
-//         }
-
-//         // Remove pin from the pinbook
-//         const clearPinsRegex = /^Clear Pins/i;
-//         if (messageText && clearPinsRegex.test(messageText)) {
-//             PinBook.clearPinBook();
-//             return null;
-//         }

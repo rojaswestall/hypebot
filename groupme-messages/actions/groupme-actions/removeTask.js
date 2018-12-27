@@ -9,14 +9,18 @@ const removeTaskGM = (indexes, brother, sender=null) => {
 	
 	if (sender && sender !== brother) {
 		var message = "Sir " + brother + " removed task";
-	} else {
+	} else if (brother !== "pins") {
 		var message = "Removed task";
+	} else {
+		var message = "Removed pin";
 	}
 
-	if (indexes.length > 1) {
+	if (indexes.length > 1 && brother) {
 		message = message + "s ";
-	} else {
+	} else if (brother !== "pins") {
 		message = message + " " + indexes[0] + " for Sir " + brother + "!";
+	} else {
+		message = message + " " + indexes[0] + "!";
 	}
 
 	getBrotherID(brother).then(id => {
@@ -48,9 +52,11 @@ const removeTaskGM = (indexes, brother, sender=null) => {
 	    		if (result.errors) {
 	    			sendMessage("There was an error finding task " + indexes[i] + " 😕 Please make sure it's in the system. Try show tasks");
 	    		} else if (i === 0) {
-	    			if (indexes.length > 1) {
+	    			if (indexes.length > 1 && brother !== "pins") {
 				    	loopMessage = loopMessage + " for Sir " + brother + "!";
-				    }
+				    } else if (indexes.length > 1 && brother === "pins") {
+				 		loopMessage = loopMessage + "!";
+				 	}
 	    			sendMessage(loopMessage);
 	    		} else {
 	    			loop(i - 1, loopMessage);

@@ -5,7 +5,7 @@ const schema = require('../../schema');
 const sendMessage = require('../sendMessage');
 const getBrotherID = require('../getBrotherID');
 
-const displayTasksGM = (brother=null) => {
+const displayTasks = (brother=null) => {
 
 	var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -37,7 +37,7 @@ const displayTasksGM = (brother=null) => {
 			} else {
 				for (var i = 0; i < tasks.length; i++) {
 					var d = new Date(Number(tasks[i].dueDate));
-					message = message + "  " + (i+1) + " - " + tasks[i].description + " " + getFormattedDate(d) + "\n"
+					message = message + "  " + (i+1) + " - " + tasks[i].description + " " + getFormattedDate(d) + "\n";
 				}
 
 				sendMessage(message);
@@ -62,7 +62,7 @@ const displayTasksGM = (brother=null) => {
 		graphql(schema, query).then(result => {
 			for (var i = 0; i < result.data.listBrothers.length; i++) {
 				var tasks = result.data.listBrothers[i].tasks;
-				if (tasks.length !== 0) {
+				if (tasks.length !== 0 && result.data.listBrothers[i].sirName !== "pins") {
 					message = message + "Sir " + result.data.listBrothers[i].sirName + ":\n";
 					for (var j = 0; j < tasks.length; j++) {
 						var d = new Date(Number(tasks[j].dueDate));
@@ -81,4 +81,4 @@ const displayTasksGM = (brother=null) => {
 	}
 }
 
-module.exports = displayTasksGM;
+module.exports = displayTasks;
